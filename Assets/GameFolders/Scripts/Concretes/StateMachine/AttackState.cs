@@ -2,7 +2,7 @@ public class AttackState : IPlayerState
 {
     public void EnterState(PlayerController player)
     {
-        // Attack Animation Start
+        player.SetAttackAnimation(true);
         player.StopPlayer();
     }
 
@@ -16,11 +16,11 @@ public class AttackState : IPlayerState
 
     public void FixedUpdateState(PlayerController player)
     {
-        // AttackState'de fiziksel hareket yapılmaz.
+        //
     }
 
     public void ExitState(PlayerController player)
     {
-        // Attack Animation End
+        player.SetAttackAnimation(false);
     }
 }

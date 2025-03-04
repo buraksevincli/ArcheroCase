@@ -2,7 +2,7 @@ public class RunningState : IPlayerState
 {
     public void EnterState(PlayerController player)
     {
-        // Start Running Animation
+        player.SetRunningAnimation(true);
     }
 
     public void UpdateState(PlayerController player)
@@ -20,6 +20,6 @@ public class RunningState : IPlayerState
 
     public void ExitState(PlayerController player)
     {
-        // End Running Animation
+        player.SetRunningAnimation(false);
     }
 }
