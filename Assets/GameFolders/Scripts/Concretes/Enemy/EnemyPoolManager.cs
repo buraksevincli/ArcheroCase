@@ -2,7 +2,7 @@ using System.Collections;
 using System.Linq;
 using UnityEngine;
 
-public class PoolManager : MonoBehaviour
+public class EnemyPoolManager : MonoBehaviour
 {
 
     [Header("Prefab & Pool Settings")]

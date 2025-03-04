@@ -13,9 +13,14 @@ public class Mover
         _moveSpeed = moveSpeed;
     }
 
-    public void Move()
+    public void Move(Transform transform)
     {
         _rigidbody.velocity = new Vector3(_joystick.Horizontal * _moveSpeed, _rigidbody.velocity.y, _joystick.Vertical * _moveSpeed);
+
+        if (_joystick.Horizontal != 0 || _joystick.Vertical != 0)
+        {
+            transform.rotation = Quaternion.LookRotation(_rigidbody.velocity);
+        }
     }
 
     public void Stop()

@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private new Rigidbody rigidbody;
     [SerializeField] private DynamicJoystick joystick;
     [SerializeField] private float moveSpeed;
+    [SerializeField] private float rotationSpeed;
 
     private Mover _mover;
     private IPlayerState _currentState;
@@ -41,7 +42,7 @@ public class PlayerController : MonoBehaviour
 
     public void MovePlayer()
     {
-        _mover.Move();
+        _mover.Move(transform);
     }
 
     public void StopPlayer()

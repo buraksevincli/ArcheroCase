@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    private PoolManager _spawnManager;
-    public void SetSpawnManager(PoolManager spawnManager)
+    private EnemyPoolManager _spawnManager;
+    public void SetSpawnManager(EnemyPoolManager spawnManager)
     {
         this._spawnManager = spawnManager;
     }
