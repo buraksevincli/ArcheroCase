@@ -1,7 +1,12 @@
-public interface IPlayerState
+using HHGArchero.Player;
+
+namespace HHGArchero.StateMachine
 {
-    void EnterState(PlayerController player);
-    void UpdateState(PlayerController player);
-    void FixedUpdateState(PlayerController player);
-    void ExitState(PlayerController player);
+    public interface IPlayerState
+    {
+        public void EnterState(PlayerController player);
+        public void UpdateState(PlayerController player);
+        public void FixedUpdateState(PlayerController player);
+        public void ExitState(PlayerController player);
+    }
 }

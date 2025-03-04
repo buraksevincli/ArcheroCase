@@ -1,18 +1,21 @@
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+namespace HHGArchero.Enemy
 {
-    private EnemyPoolManager _spawnManager;
-    public void SetSpawnManager(EnemyPoolManager spawnManager)
+    public class EnemyController : MonoBehaviour
     {
-        this._spawnManager = spawnManager;
-    }
-
-    private void OnMouseDown()
-    {
-        if (_spawnManager != null)
+        private EnemyPoolManager _spawnManager;
+        public void SetSpawnManager(EnemyPoolManager spawnManager)
         {
-            _spawnManager.ReturnAndRespawn(this);
+            this._spawnManager = spawnManager;
+        }
+
+        private void OnMouseDown()
+        {
+            if (_spawnManager != null)
+            {
+                _spawnManager.ReturnAndRespawn(this);
+            }
         }
     }
 }

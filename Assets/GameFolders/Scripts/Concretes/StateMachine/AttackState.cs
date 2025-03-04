@@ -1,26 +1,31 @@
-public class AttackState : IPlayerState
+using HHGArchero.Player;
+
+namespace HHGArchero.StateMachine
 {
-    public void EnterState(PlayerController player)
+    public class AttackState : IPlayerState
     {
-        player.SetAttackAnimation(true);
-        player.StopPlayer();
-    }
-
-    public void UpdateState(PlayerController player)
-    {
-        if (player.JoystickInputMagnitude() > 0.1f)
+        public void EnterState(PlayerController player)
         {
-            player.TransitionToState(new RunningState());
+            player.SetAttackAnimation(true);
+            player.StopPlayer();
         }
-    }
 
-    public void FixedUpdateState(PlayerController player)
-    {
-        //
-    }
+        public void UpdateState(PlayerController player)
+        {
+            if (player.JoystickInputMagnitude() > 0.1f)
+            {
+                player.TransitionToState(new RunningState());
+            }
+        }
 
-    public void ExitState(PlayerController player)
-    {
-        player.SetAttackAnimation(false);
+        public void FixedUpdateState(PlayerController player)
+        {
+            //
+        }
+
+        public void ExitState(PlayerController player)
+        {
+            player.SetAttackAnimation(false);
+        }
     }
 }
