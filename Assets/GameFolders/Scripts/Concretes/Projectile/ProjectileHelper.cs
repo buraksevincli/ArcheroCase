@@ -14,7 +14,7 @@ namespace HHGArchero.Projectile
             float distance = toTargetXZ.magnitude;
             float yOffset = toTarget.y;
             float gravity = Mathf.Abs(Physics.gravity.y);
-        
+            
             float cosAngle = Mathf.Cos(angleRadians);
             float sinAngle = Mathf.Sin(angleRadians);
             float denominator = distance * Mathf.Tan(angleRadians) - yOffset;

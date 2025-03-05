@@ -17,7 +17,7 @@ namespace HHGArchero.Enemy
         private GameData _gameData;
         private Vector2 _spawnAreaMin, _spawnAreaMax;
         private int _enemyPoolSize;
-        private float _spawnDelay, _minimumDistanceBetweenEnemies, _minimumDistanceFromPlayer;
+        private float _minimumDistanceBetweenEnemies, _minimumDistanceFromPlayer;
         private ObjectPool<EnemyController> _objectPool;
 
         private List<Transform> _activeEnemies = new List<Transform>();
@@ -32,7 +32,6 @@ namespace HHGArchero.Enemy
             _enemyPoolSize = _gameData.EnemyPoolSize;
             _spawnAreaMin = _gameData.SpawnAreaMin;
             _spawnAreaMax = _gameData.SpawnAreaMax;
-            _spawnDelay = _gameData.SpawnDelay;
             _minimumDistanceBetweenEnemies = _gameData.MinimumDistanceBetweenEnemies;
             _minimumDistanceFromPlayer = _gameData.MinimumDistanceFromPlayer;
             _playerTransform = PlayerController.Instance.transform;
@@ -63,7 +62,7 @@ namespace HHGArchero.Enemy
                 _activeEnemies.Remove(obj.transform);
 
             _objectPool.ReturnToPool(obj);
-            StartCoroutine(RespawnAfterDelay());
+            SpawnAtRandomPosition();
         }
 
         private void SpawnAtRandomPosition()
@@ -102,12 +101,6 @@ namespace HHGArchero.Enemy
                 candidate = GetRandomPosition();
             }
             return candidate;
-        }
-
-        private IEnumerator RespawnAfterDelay()
-        {
-            yield return new WaitForSeconds(_spawnDelay);
-            SpawnAtRandomPosition();
         }
     }
 }

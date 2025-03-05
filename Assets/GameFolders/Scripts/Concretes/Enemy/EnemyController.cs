@@ -12,14 +12,6 @@ namespace HHGArchero.Enemy
             _spawnManager = spawnManager;
         }
 
-        private void OnMouseDown()
-        {
-            if (_spawnManager != null)
-            {
-                _spawnManager.ReturnAndRespawn(this);
-            }
-        }
-
         private void OnTriggerEnter(Collider other)
         {
             if (!other.TryGetComponent(out ProjectileController projectile)) return;

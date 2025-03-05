@@ -3,6 +3,7 @@ using System.Linq;
 using UnityEngine;
 using HHGArchero.Projectile;
 using HHGArchero.Enemy;
+using HHGArchero.Managers;
 using HHGArchero.StateMachine;
 using HHGArchero.Utilities;
 #pragma warning disable CS0108, CS0114
@@ -19,6 +20,7 @@ namespace HHGArchero.Player
         
         private Mover _mover;
         private IPlayerState _currentState;
+        private bool _canMove = true;
         
         protected override void Awake()
         {
@@ -27,22 +29,31 @@ namespace HHGArchero.Player
             _currentState = new AttackState();
             _currentState.EnterState(this);
         }
+
+        private void OnEnable()
+        {
+            GameManager.Instance.OnGamePaused += OnGamePausedHandler;
+        }
+
+        private void OnDisable()
+        {
+            GameManager.Instance.OnGamePaused -= OnGamePausedHandler;
+        }
+
         
         private void Update()
         {
+            if (!_canMove) return;
             _currentState.UpdateState(this);
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                FireProjectile();
-            }
         }
         
         private void FixedUpdate()
         {
+            if (!_canMove) return;
             _currentState.FixedUpdateState(this);
         }
         
-        private void FireProjectile()
+        public void FireProjectile()
         {
             List<Transform> activeEnemies = EnemyPoolManager.Instance.ActiveEnemies;
             if (activeEnemies == null || activeEnemies.Count == 0)
@@ -88,6 +99,11 @@ namespace HHGArchero.Player
         public void StopPlayer()
         {
             _mover.Stop();
+        }
+        
+        private void OnGamePausedHandler(bool isPaused)
+        {
+            _canMove = !isPaused;
         }
         
         public void SetAttackAnimation(bool isAttacking)

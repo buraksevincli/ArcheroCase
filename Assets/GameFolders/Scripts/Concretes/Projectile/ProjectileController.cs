@@ -1,4 +1,5 @@
 using System.Collections;
+using HHGArchero.Managers;
 using UnityEngine;
 
 namespace HHGArchero.Projectile
@@ -10,6 +11,22 @@ namespace HHGArchero.Projectile
         private Coroutine _movementCoroutine;
         private Vector3 _initialVelocity;
         private float _timeSinceLaunch = 0f;
+        private bool _canMove = true;
+        
+        private void OnEnable()
+        {
+            GameManager.Instance.OnGamePaused += OnGamePausedHandler;
+        }
+        
+        private void OnDisable()
+        {
+            GameManager.Instance.OnGamePaused -= OnGamePausedHandler;
+        }
+        
+        private void OnGamePausedHandler(bool isPaused)
+        {
+            _canMove = !isPaused;
+        }
 
         public void SetPoolManager(ProjectilePoolManager poolManager)
         {
@@ -21,31 +38,34 @@ namespace HHGArchero.Projectile
             gameObject.SetActive(true);
             _launched = true;
             _initialVelocity = initialVelocity;
-            _timeSinceLaunch = 0f;
             if(_movementCoroutine != null)
                 StopCoroutine(_movementCoroutine);
             _movementCoroutine = StartCoroutine(ProjectileMotion());
-            StartCoroutine(ReturnAfterTimeout(3f));
         }
         
         private IEnumerator ProjectileMotion()
         {
             Vector3 startPos = transform.position;
+            float time = 0f;
+            _timeSinceLaunch = 0f;
             while (_launched)
             {
+                if (!_canMove)
+                {
+                    yield return null; // Pauses the coroutine's execution and resumes it in the next frame.
+                    continue;
+                }
+                time += Time.deltaTime;
+                if (time >= 3f)
+                {
+                    time = 0;
+                    ReturnToPool();
+                    yield break;
+                }
                 _timeSinceLaunch += Time.deltaTime;
                 // Projectile motion: position = start + v0*t + 0.5*g*t^2
                 transform.position = startPos + _initialVelocity * _timeSinceLaunch + Physics.gravity * (0.5f * _timeSinceLaunch * _timeSinceLaunch);
-                yield return null;
-            }
-        }
-
-        private IEnumerator ReturnAfterTimeout(float timeout)
-        {
-            yield return new WaitForSeconds(timeout);
-            if (_launched)
-            {
-                ReturnToPool();
+                yield return null; // Pauses the coroutine's execution and resumes it in the next frame.
             }
         }
         

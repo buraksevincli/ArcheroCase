@@ -10,7 +10,6 @@ namespace HHGArchero.Projectile
         private GameData _gameData;
         private ProjectileController _projectilePrefab;
         private int _poolSize;
-
         private ObjectPool<ProjectileController> _projectilePool;
 
         protected override void Awake()

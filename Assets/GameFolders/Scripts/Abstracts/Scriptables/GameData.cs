@@ -19,8 +19,6 @@ namespace HHGArchero.Scriptables
         [SerializeField] private Vector2 spawnAreaMin = new Vector2(-4f, -8f);
         [Tooltip("Maximum X and Z coordinates of the spawn area.")]
         [SerializeField] private Vector2 spawnAreaMax = new Vector2(4f, 8f);
-        [Tooltip("Delay before an object is respawned after being returned to the pool.")]
-        [SerializeField] private float spawnDelay = 1f;
         [Tooltip("Minimum allowed distance between spawned objects.")]
         [SerializeField] private float minimumDistanceBetweenEnemies = 2f;
         [Tooltip("Minimum allowed distance from the player for spawned enemies.")]
@@ -31,17 +29,18 @@ namespace HHGArchero.Scriptables
         [SerializeField] private ProjectileController projectilePrefab;
         [SerializeField] private int poolSize = 10;
         [SerializeField] private int projectileAngle = 30;
+        [SerializeField] private float fireRate = 1f;
         
         public int MoveSpeed => moveSpeed;
         public EnemyController PooledObject => pooledObject;
         public int EnemyPoolSize => enemyPoolSize;
         public Vector2 SpawnAreaMin => spawnAreaMin;
         public Vector2 SpawnAreaMax => spawnAreaMax;
-        public float SpawnDelay => spawnDelay;
         public float MinimumDistanceBetweenEnemies => minimumDistanceBetweenEnemies;
         public float MinimumDistanceFromPlayer => minimumDistanceFromPlayer;
         public ProjectileController ProjectilePrefab => projectilePrefab;
         public int PoolSize => poolSize;
         public int ProjectileAngle => projectileAngle;
+        public float FireRate => fireRate;
     }
 }
