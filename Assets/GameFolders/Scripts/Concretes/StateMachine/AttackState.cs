@@ -16,6 +16,7 @@ namespace HHGArchero.StateMachine
             {
                 player.TransitionToState(new RunningState());
             }
+            
         }
 
         public void FixedUpdateState(PlayerController player)

@@ -1,3 +1,4 @@
+using HHGArchero.Managers;
 using UnityEngine;
 
 namespace HHGArchero.Player
@@ -6,17 +7,17 @@ namespace HHGArchero.Player
     {
         private readonly Rigidbody _rigidbody;
         private readonly DynamicJoystick _joystick;
-        private readonly float _moveSpeed;
+        private float _moveSpeed;
 
-        public Mover(Rigidbody rigidbody, DynamicJoystick joystick, float moveSpeed)
+        public Mover(Rigidbody rigidbody, DynamicJoystick joystick)
         {
             _rigidbody = rigidbody;
             _joystick = joystick;
-            _moveSpeed = moveSpeed;
         }
 
         public void Move(Transform transform)
         {
+            _moveSpeed = DataManager.Instance.GameData.MoveSpeed;
             _rigidbody.velocity = new Vector3(_joystick.Horizontal * _moveSpeed, _rigidbody.velocity.y, _joystick.Vertical * _moveSpeed);
 
             if (_joystick.Horizontal != 0 || _joystick.Vertical != 0)
