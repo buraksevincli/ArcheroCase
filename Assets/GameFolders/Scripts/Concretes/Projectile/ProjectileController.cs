@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using HHGArchero.Enemies;
 using HHGArchero.Managers;
 using UnityEngine;
 
@@ -12,7 +14,8 @@ namespace HHGArchero.Projectile
         private Vector3 _initialVelocity;
         private float _timeSinceLaunch = 0f;
         private bool _canMove = true;
-        
+        private int _projectileDamage = 10;
+
         private void OnEnable()
         {
             GameManager.Instance.OnGamePaused += OnGamePausedHandler;
@@ -47,6 +50,7 @@ namespace HHGArchero.Projectile
         {
             Vector3 startPos = transform.position;
             float time = 0f;
+            int projectileLifeTime = DataManager.Instance.GameData.ProjectileLifeTime;
             _timeSinceLaunch = 0f;
             while (_launched)
             {
@@ -56,7 +60,7 @@ namespace HHGArchero.Projectile
                     continue;
                 }
                 time += Time.deltaTime;
-                if (time >= 3f)
+                if (time >= projectileLifeTime)
                 {
                     time = 0;
                     ReturnToPool();
@@ -64,7 +68,7 @@ namespace HHGArchero.Projectile
                 }
                 _timeSinceLaunch += Time.deltaTime;
                 // Projectile motion: position = start + v0*t + 0.5*g*t^2
-                transform.position = startPos + _initialVelocity * _timeSinceLaunch + Physics.gravity * (0.5f * _timeSinceLaunch * _timeSinceLaunch);
+                transform.position = startPos + _initialVelocity * _timeSinceLaunch + Physics.gravity * (0.5f * _timeSinceLaunch * _timeSinceLaunch); // Simulate gravity effect
                 yield return null; // Pauses the coroutine's execution and resumes it in the next frame.
             }
         }
@@ -73,6 +77,10 @@ namespace HHGArchero.Projectile
         {
             if (_launched)
             {
+                if (other.TryGetComponent(out IDamageable damageable))
+                {
+                    damageable.TakeDamage(_projectileDamage);
+                }
                 ReturnToPool();
             }
         }

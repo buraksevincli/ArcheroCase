@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -52,8 +53,8 @@ namespace HHGArchero.Player
             if (!_canMove) return;
             _currentState.FixedUpdateState(this);
         }
-        
-        public void FireProjectile()
+
+        public void FireSingleProjectile()
         {
             List<Transform> activeEnemies = EnemyPoolManager.Instance.ActiveEnemies;
             if (activeEnemies == null || activeEnemies.Count == 0)
@@ -65,14 +66,15 @@ namespace HHGArchero.Player
     
             if (!target)
                 return;
+    
             transform.LookAt(target);
-            
+    
             Vector3 launchVelocity;
             if (!ProjectileHelper.CalculateLaunchVelocity(bowTransform.position, target.position, out launchVelocity))
             {
                 return;
             }
-            
+    
             ProjectileController projectile = projectilePoolManager.GetProjectile();
             projectile.SetPoolManager(projectilePoolManager);
             projectile.transform.position = bowTransform.position;

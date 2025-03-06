@@ -29,7 +29,9 @@ namespace HHGArchero.Scriptables
         [SerializeField] private ProjectileController projectilePrefab;
         [SerializeField] private int poolSize = 10;
         [SerializeField] private int projectileAngle = 30;
-        [SerializeField] private float fireRate = 1f;
+        [SerializeField] private int projectileLifeTime = 3;
+        [SerializeField] private float fireRate = .5f;
+        [SerializeField] private float projectileDelay = .2f;
         
         public int MoveSpeed => moveSpeed;
         public EnemyController PooledObject => pooledObject;
@@ -41,6 +43,8 @@ namespace HHGArchero.Scriptables
         public ProjectileController ProjectilePrefab => projectilePrefab;
         public int PoolSize => poolSize;
         public int ProjectileAngle => projectileAngle;
+        public int ProjectileLifeTime => projectileLifeTime;
         public float FireRate => fireRate;
+        public float ProjectileDelay => projectileDelay;
     }
 }

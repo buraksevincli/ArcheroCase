@@ -20,7 +20,5 @@ namespace HHGArchero.Managers
         }
 
         public event Action<bool> OnGamePaused;
-        
     }
-    
 }

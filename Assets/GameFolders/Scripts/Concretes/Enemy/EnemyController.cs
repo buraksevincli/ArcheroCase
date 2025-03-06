@@ -1,12 +1,12 @@
-using System;
-using HHGArchero.Projectile;
+using HHGArchero.Enemies;
 using UnityEngine;
 
 namespace HHGArchero.Enemy
 {
-    public class EnemyController : MonoBehaviour
+    public class EnemyController : MonoBehaviour, IDamageable
     {
         private EnemyPoolManager _spawnManager;
+        private int _health = 100;
         public void SetSpawnManager(EnemyPoolManager spawnManager)
         {
             _spawnManager = spawnManager;
@@ -14,12 +14,14 @@ namespace HHGArchero.Enemy
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!other.TryGetComponent(out ProjectileController projectile)) return;
-            if (projectile == null) return;
-            if (_spawnManager != null)
-            {
-                _spawnManager.ReturnAndRespawn(this);
-            }
+            if (_spawnManager == null || _health > 0) return;
+            _health = 100;
+            _spawnManager.ReturnAndRespawn(this);
+        }
+
+        public void TakeDamage(int damage)
+        {
+            _health -= damage;
         }
     }
 }
