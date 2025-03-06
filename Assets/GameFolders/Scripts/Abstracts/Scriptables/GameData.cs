@@ -33,7 +33,7 @@ namespace HHGArchero.Scriptables
         [SerializeField] private float fireRate = .75f;
         [SerializeField] private float projectileDelay = .2f;
         [SerializeField] private int projectileDamage = 10;
-        [SerializeField] private int projectileBurnDamage = 3;
+        [SerializeField] private int projectileBurnDamage = 10;
         
         public int MoveSpeed => moveSpeed;
         public EnemyController PooledObject => pooledObject;

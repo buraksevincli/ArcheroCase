@@ -9,6 +9,7 @@ namespace HHGArchero.Enemy
     {
         private EnemyPoolManager _spawnManager;
         private int _health = 100;
+        private bool _isDead;
 
         private struct BurnEffect
         {
@@ -19,26 +20,58 @@ namespace HHGArchero.Enemy
         
         private List<BurnEffect> _burnEffects = new List<BurnEffect>();
 
-        private readonly float _burnTickInterval = 1f; 
+        private readonly float _burnTickInterval = 1f;
+        
+        private void Update()
+        {
+            if (GameManager.Instance.IsPaused || _isDead)
+                return;
+
+            for (int i = _burnEffects.Count - 1; i >= 0; i--)
+            {
+                BurnEffect effect = _burnEffects[i];
+                if (Time.time >= effect.NextTickTime)
+                {
+                    TakeDamage(effect.DamagePerTick);
+                    if (_isDead || _burnEffects.Count == 0)
+                    {
+                        return;
+                    }
+                    effect.NextTickTime += _burnTickInterval;
+                    effect.TicksRemaining--;
+                    if (effect.TicksRemaining <= 0 )
+                    {
+                        _burnEffects.RemoveAt(i);
+                    }
+                    else
+                    {
+                        _burnEffects[i] = effect; 
+                    }
+                }
+            }
+        }
+
+        private void Die()
+        {
+            _isDead = true;
+            _spawnManager.ReturnAndRespawn(this);
+        }
 
         public void SetSpawnManager(EnemyPoolManager spawnManager)
         {
             _spawnManager = spawnManager;
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (_spawnManager != null && _health <= 0)
-            {
-                ClearBurnEffects();
-                _health = 100;
-                _spawnManager.ReturnAndRespawn(this);
-            }
+            _isDead = false;
+            _burnEffects.Clear();
+            _health = 100;
         }
 
         public void TakeDamage(int damage)
         {
             _health -= damage;
+            if (_health <= 0)
+            {
+                Die();
+            }
         }
         
         public void ApplyBurn(int damagePerTick, float burnDuration)
@@ -55,37 +88,6 @@ namespace HHGArchero.Enemy
                 DamagePerTick = damagePerTick
             };
             _burnEffects.Add(newEffect);
-        }
-
-        private void ClearBurnEffects()
-        {
-            _burnEffects.Clear();
-        }
-
-        private void Update()
-        {
-            if (GameManager.Instance.IsPaused)
-                return;
-
-            for (int i = _burnEffects.Count - 1; i >= 0; i--)
-            {
-                BurnEffect effect = _burnEffects[i];
-                if (Time.time >= effect.NextTickTime)
-                {
-                    TakeDamage(effect.DamagePerTick);
-                    effect.NextTickTime += _burnTickInterval;
-                    effect.TicksRemaining--;
-                    
-                    if (effect.TicksRemaining <= 0)
-                    {
-                        _burnEffects.RemoveAt(i);
-                    }
-                    else
-                    {
-                        _burnEffects[i] = effect; 
-                    }
-                }
-            }
         }
     }
 }
