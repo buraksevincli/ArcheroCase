@@ -12,12 +12,13 @@ namespace HHGArchero.Managers
         private bool _rage;
 
         private int _projectileMultiplicationCount = 1;
-        private int _projectileBounceCount = 1;
-        private int _projectileBurnCount = 1;
+        private int _projectileBounceCount = 0;
+        private int _projectileBurnTime = 0;
         private int _projectileFireSpeedCount = 1;
+        
         public int ProjectileMultiplicationCount => _projectileMultiplicationCount;
         public int ProjectileBounceCount => _projectileBounceCount;
-        public int ProjectileBurnCount => _projectileBurnCount;
+        public int ProjectileBurnTime => _projectileBurnTime;
         public int ProjectileFireSpeedCount => _projectileFireSpeedCount;
 
         private void OnEnable()
@@ -55,16 +56,16 @@ namespace HHGArchero.Managers
             }
             else
             {
-                _projectileBounceCount = 1;
+                _projectileBounceCount = 0;
             }
 
             if (_burn)
             {
-                _projectileBurnCount = _rage ? 2 : 1;
+                _projectileBurnTime = _rage ? 6 : 3;
             }
             else
             {
-                _projectileBurnCount = 1;
+                _projectileBurnTime = 0;
             }
 
             if (_speed)

@@ -30,8 +30,10 @@ namespace HHGArchero.Scriptables
         [SerializeField] private int poolSize = 10;
         [SerializeField] private int projectileAngle = 30;
         [SerializeField] private int projectileLifeTime = 3;
-        [SerializeField] private float fireRate = .5f;
+        [SerializeField] private float fireRate = .75f;
         [SerializeField] private float projectileDelay = .2f;
+        [SerializeField] private int projectileDamage = 10;
+        [SerializeField] private int projectileBurnDamage = 3;
         
         public int MoveSpeed => moveSpeed;
         public EnemyController PooledObject => pooledObject;
@@ -46,5 +48,7 @@ namespace HHGArchero.Scriptables
         public int ProjectileLifeTime => projectileLifeTime;
         public float FireRate => fireRate;
         public float ProjectileDelay => projectileDelay;
+        public int ProjectileDamage => projectileDamage;
+        public int ProjectileBurnDamage => projectileBurnDamage;
     }
 }

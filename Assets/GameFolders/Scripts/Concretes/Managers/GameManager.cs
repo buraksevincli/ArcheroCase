@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace HHGArchero.Managers
 {
-    [DefaultExecutionOrder(-50)]
     public class GameManager : MonoSingleton<GameManager>
     {
         private bool _isPaused;

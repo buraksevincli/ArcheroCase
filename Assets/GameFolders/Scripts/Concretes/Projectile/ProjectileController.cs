@@ -1,6 +1,8 @@
-using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using HHGArchero.Enemies;
+using HHGArchero.Enemy;
 using HHGArchero.Managers;
 using UnityEngine;
 
@@ -14,7 +16,8 @@ namespace HHGArchero.Projectile
         private Vector3 _initialVelocity;
         private float _timeSinceLaunch = 0f;
         private bool _canMove = true;
-        private int _projectileDamage = 10;
+        private Vector3 _startPos;
+        private int _remainingBounces;
 
         private void OnEnable()
         {
@@ -41,6 +44,8 @@ namespace HHGArchero.Projectile
             gameObject.SetActive(true);
             _launched = true;
             _initialVelocity = initialVelocity;
+            _startPos = transform.position;
+            _remainingBounces = SkillManager.Instance.ProjectileBounceCount;
             if(_movementCoroutine != null)
                 StopCoroutine(_movementCoroutine);
             _movementCoroutine = StartCoroutine(ProjectileMotion());
@@ -48,7 +53,6 @@ namespace HHGArchero.Projectile
         
         private IEnumerator ProjectileMotion()
         {
-            Vector3 startPos = transform.position;
             float time = 0f;
             int projectileLifeTime = DataManager.Instance.GameData.ProjectileLifeTime;
             _timeSinceLaunch = 0f;
@@ -68,7 +72,7 @@ namespace HHGArchero.Projectile
                 }
                 _timeSinceLaunch += Time.deltaTime;
                 // Projectile motion: position = start + v0*t + 0.5*g*t^2
-                transform.position = startPos + _initialVelocity * _timeSinceLaunch + Physics.gravity * (0.5f * _timeSinceLaunch * _timeSinceLaunch); // Simulate gravity effect
+                transform.position = _startPos + _initialVelocity * _timeSinceLaunch + Physics.gravity * (0.5f * _timeSinceLaunch * _timeSinceLaunch); // Simulate gravity effect
                 yield return null; // Pauses the coroutine's execution and resumes it in the next frame.
             }
         }
@@ -79,11 +83,55 @@ namespace HHGArchero.Projectile
             {
                 if (other.TryGetComponent(out IDamageable damageable))
                 {
-                    damageable.TakeDamage(_projectileDamage);
+                    damageable.TakeDamage(DataManager.Instance.GameData.ProjectileDamage);
                 }
-                ReturnToPool();
+                
+                if (SkillManager.Instance.ProjectileBurnTime > 0)
+                {
+                    if (other.TryGetComponent(out EnemyController enemy))
+                    {
+                        int burnDamage = DataManager.Instance.GameData.ProjectileBurnDamage; 
+                        float burnDuration = SkillManager.Instance.ProjectileBurnTime; 
+                        enemy.ApplyBurn(burnDamage, burnDuration);
+                    }
+                }
+
+                if (_remainingBounces > 0)
+                {
+                    BounceToNextEnemy(other.transform);
+                }
+                else
+                {
+                    ReturnToPool();
+                }
             }
         }
+        
+        private void BounceToNextEnemy(Transform currentEnemy)
+        {
+            transform.position = currentEnemy.position;
+            _startPos = currentEnemy.position; 
+
+            List<Transform> activeEnemies = EnemyPoolManager.Instance.ActiveEnemies;
+            Transform nextTarget = activeEnemies
+                .Where(e => e != currentEnemy)
+                .OrderBy(e => Vector3.Distance(currentEnemy.position, e.position))
+                .FirstOrDefault();
+    
+            if (nextTarget != null)
+            {
+                Vector3 newLaunchVelocity;
+                if (ProjectileHelper.CalculateLaunchVelocity(transform.position, nextTarget.position, out newLaunchVelocity))
+                {
+                    _initialVelocity = newLaunchVelocity;
+                    _timeSinceLaunch = 0f;
+                    _remainingBounces--;
+                    return;
+                }
+            }
+            ReturnToPool();
+        }
+
 
         private void ReturnToPool()
         {
