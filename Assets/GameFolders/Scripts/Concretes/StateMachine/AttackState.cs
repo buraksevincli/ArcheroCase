@@ -6,7 +6,7 @@ namespace HHGArchero.StateMachine
 {
     public class AttackState : IPlayerState
     {
-        private float _fireRate = DataManager.Instance.ProjectileData.FireRate;
+        private float _fireRate = DataManager.Instance.ProjectileData.FireRate / 2;
         private float _projectileDelay = DataManager.Instance.ProjectileData.ProjectileDelay;
 
         private float _fireTimer = 0f;
@@ -15,11 +15,12 @@ namespace HHGArchero.StateMachine
 
         public void EnterState(PlayerController player)
         {
-            player.SetAttackAnimation(true);
             player.StopPlayer();
             _fireTimer = 0f;
             _projectileFired = 0;
             _lastProjectileTime = Time.time;
+            player.SelectTarget();
+            player.SetAttackAnimation(true);
         }
 
         public void UpdateState(PlayerController player)
@@ -35,6 +36,8 @@ namespace HHGArchero.StateMachine
 
             if (_projectileFired == 0 && _fireTimer >= _fireRate / SkillManager.Instance.ProjectileFireSpeedCount)
             {
+                _fireRate = DataManager.Instance.ProjectileData.FireRate;
+                player.SetAnimationSpeed(SkillManager.Instance.ProjectileFireSpeedCount / _fireRate);
                 player.FireSingleProjectile();
                 _projectileFired = 1;
                 _lastProjectileTime = Time.time;
@@ -63,6 +66,7 @@ namespace HHGArchero.StateMachine
         public void ExitState(PlayerController player)
         {
             player.SetAttackAnimation(false);
+            player.SetAnimationSpeed(1);
             _fireTimer = 0f;
             _projectileFired = 0;
         }

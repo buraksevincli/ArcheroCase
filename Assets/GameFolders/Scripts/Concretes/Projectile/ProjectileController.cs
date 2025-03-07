@@ -70,7 +70,7 @@ namespace HHGArchero.Projectile
                     ReturnToPool();
                     yield break;
                 }
-                _timeSinceLaunch += Time.deltaTime;
+                _timeSinceLaunch += Time.deltaTime * 2;
                 // Projectile motion: position = start + v0*t + 0.5*g*t^2
                 transform.position = _startPos + _initialVelocity * _timeSinceLaunch + Physics.gravity * (0.5f * _timeSinceLaunch * _timeSinceLaunch); // Simulate gravity effect
                 yield return null; // Pauses the coroutine's execution and resumes it in the next frame.

@@ -16,9 +16,9 @@ namespace HHGArchero.Scriptables
         [Tooltip("Lifetime of the projectile in seconds before it automatically returns to the pool.")]
         [SerializeField] private int projectileLifeTime = 3;
         [Tooltip("Time interval (in seconds) between consecutive projectile fires (fire rate).")]
-        [SerializeField] private float fireRate = 0.75f;
+        [SerializeField] private float fireRate = 1f;
         [Tooltip("Delay (in seconds) between consecutive projectiles when firing multiple arrows sequentially.")]
-        [SerializeField] private float projectileDelay = 0.2f;
+        [SerializeField] private float projectileDelay = 0.1f;
         [Tooltip("Base damage inflicted by the projectile upon impact.")]
         [SerializeField] private int projectileDamage = 10;
         [Tooltip("Damage per tick of burn effect inflicted by the projectile.")]

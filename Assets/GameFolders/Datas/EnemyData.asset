@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1afdea298bb2487a876c3079d34818b1, type: 3}
   m_Name: EnemyData
   m_EditorClassIdentifier: 
+  _maxHealth: 100
   pooledObject: {fileID: 5325064499506715189, guid: 6cba2c28e11f37c4fba09a3c05ecb1ba, type: 3}
   enemyPoolSize: 5
-  spawnAreaMin: {x: -4, y: -8}
-  spawnAreaMax: {x: 4, y: 8}
+  spawnAreaMin: {x: -7, y: -15}
+  spawnAreaMax: {x: 7, y: 7}
   minimumDistanceBetweenEnemies: 2
   minimumDistanceFromPlayer: 5

@@ -16,7 +16,8 @@ MonoBehaviour:
   poolSize: 10
   projectileAngle: 30
   projectileLifeTime: 3
-  fireRate: 0.75
-  projectileDelay: 0.2
+  fireRate: 1
+  projectileDelay: 0.1
   projectileDamage: 10
-  projectileBurnDamage: 10
+  projectileBurnDamage: 5
+  projectileBurnTickRate: 0.2

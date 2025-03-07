@@ -69,6 +69,8 @@ namespace HHGArchero.Enemy
         {
             EnemyController pooledObj = _objectPool.Get();
             pooledObj.transform.position = GetValidRandomPosition();
+            Vector3 targetPosition = new Vector3(_playerTransform.position.x, pooledObj.transform.position.y, _playerTransform.position.z);
+            pooledObj.transform.LookAt(targetPosition);
             pooledObj.SetSpawnManager(this);
             // Add the enemy to the active list if not already added.
             if (!_activeEnemies.Contains(pooledObj.transform))

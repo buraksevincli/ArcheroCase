@@ -14,20 +14,19 @@ namespace HHGArchero.Projectile
             float distance = toTargetXZ.magnitude;
             float yOffset = toTarget.y;
             float gravity = Mathf.Abs(Physics.gravity.y);
-            
+
             float cosAngle = Mathf.Cos(angleRadians);
             float sinAngle = Mathf.Sin(angleRadians);
             float denominator = distance * Mathf.Tan(angleRadians) - yOffset;
             if (denominator <= 0)
                 return false;
-        
-            float initialSpeed = Mathf.Sqrt((gravity * distance * distance) / (2 * denominator * cosAngle * cosAngle));
+
+            float initialSpeed = Mathf.Sqrt((gravity * distance * distance) / (2 *denominator * cosAngle * cosAngle));
             if (float.IsNaN(initialSpeed))
                 return false;
-        
+
             launchVelocity = toTargetXZ.normalized * (initialSpeed * cosAngle) + Vector3.up * (initialSpeed * sinAngle);
             return true;
         }
     }
 }
-

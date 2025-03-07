@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -19,13 +18,16 @@ namespace HHGArchero.Player
         [SerializeField] private Transform bowTransform;
         [SerializeField] private ProjectilePoolManager projectilePoolManager;
         
+        private Animator _animator;
         private Mover _mover;
+        private Transform _currentEnemy;
         private IPlayerState _currentState;
         private bool _canMove = true;
         
         protected override void Awake()
         {
             base.Awake();
+            _animator = GetComponent<Animator>();
             _mover = new Mover(rigidbody, joystick);
             _currentState = new AttackState();
             _currentState.EnterState(this);
@@ -54,7 +56,7 @@ namespace HHGArchero.Player
             _currentState.FixedUpdateState(this);
         }
 
-        public void FireSingleProjectile()
+        public void SelectTarget()
         {
             List<Transform> activeEnemies = EnemyPoolManager.Instance.ActiveEnemies;
             if (activeEnemies == null || activeEnemies.Count == 0)
@@ -63,14 +65,17 @@ namespace HHGArchero.Player
             Transform target = activeEnemies
                 .OrderBy(e => Vector3.Distance(bowTransform.position, e.position))
                 .FirstOrDefault();
-    
-            if (!target)
-                return;
-    
+            if (!target) return;
+            _currentEnemy = target;
             transform.LookAt(target);
-    
+        }
+
+        public void FireSingleProjectile()
+        {
+            SelectTarget();
+            transform.LookAt(_currentEnemy);
             Vector3 launchVelocity;
-            if (!ProjectileHelper.CalculateLaunchVelocity(bowTransform.position, target.position, out launchVelocity))
+            if (!ProjectileHelper.CalculateLaunchVelocity(bowTransform.position, _currentEnemy.position, out launchVelocity))
             {
                 return;
             }
@@ -106,16 +111,22 @@ namespace HHGArchero.Player
         private void OnGamePausedHandler(bool isPaused)
         {
             _canMove = !isPaused;
+            _animator.enabled = !isPaused;
         }
         
         public void SetAttackAnimation(bool isAttacking)
         {
-            // Set Attack Animation here
+            _animator.SetBool("IsAttack", isAttacking);
         }
         
         public void SetRunningAnimation(bool isRunning)
         {
-            // Set Running Animation here
+            _animator.SetBool("IsRun", isRunning);
+        }
+
+        public void SetAnimationSpeed(float animationSpeed)
+        {
+            _animator.speed = animationSpeed;
         }
     }
 }
