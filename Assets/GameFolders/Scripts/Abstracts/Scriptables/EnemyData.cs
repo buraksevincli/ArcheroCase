@@ -6,6 +6,9 @@ namespace HHGArchero.Scriptables
     [CreateAssetMenu(fileName = "EnemyData", menuName = "Data/Enemy Data")]
     public class EnemyData : ScriptableObject
     { 
+        [Header("Enemy Settings")]
+        [SerializeField] private int _maxHealth = 100;
+        
         [Header("Enemy Pool Settings")]
         [Tooltip("Prefab to pool. Must have an EnemyController component.")]
         [SerializeField] private EnemyController pooledObject;
@@ -20,6 +23,7 @@ namespace HHGArchero.Scriptables
         [Tooltip("Minimum allowed distance from the player for spawned enemies.")]
         [SerializeField] private float minimumDistanceFromPlayer = 5f;
         
+        public int MaxHealth => _maxHealth;
         public EnemyController PooledObject => pooledObject;
         public int EnemyPoolSize => enemyPoolSize;
         public Vector2 SpawnAreaMin => spawnAreaMin;

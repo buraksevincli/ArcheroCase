@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using HHGArchero.Enemies;
 using HHGArchero.Managers;
+using HHGArchero.Scriptables;
 using UnityEngine;
 
 namespace HHGArchero.Enemy
@@ -8,8 +9,11 @@ namespace HHGArchero.Enemy
     public class EnemyController : MonoBehaviour, IDamageable
     {
         private EnemyPoolManager _spawnManager;
-        private int _health = 100;
+        private EnemyData _enemyData;
+        private ProjectileData _projectileData;
+        private int _health;
         private bool _isDead;
+        private float _burnTickInterval;
 
         private struct BurnEffect
         {
@@ -20,8 +24,14 @@ namespace HHGArchero.Enemy
         
         private List<BurnEffect> _burnEffects = new List<BurnEffect>();
 
-        private readonly float _burnTickInterval = 1f;
-        
+        private void Awake()
+        {
+            _enemyData = DataManager.Instance.EnemyData;
+            _projectileData = DataManager.Instance.ProjectileData;
+            _health = _enemyData.MaxHealth;
+            _burnTickInterval = _projectileData.ProjectileBurnTickRate;
+        }
+
         private void Update()
         {
             if (GameManager.Instance.IsPaused || _isDead)

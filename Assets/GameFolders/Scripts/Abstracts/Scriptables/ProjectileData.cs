@@ -22,7 +22,9 @@ namespace HHGArchero.Scriptables
         [Tooltip("Base damage inflicted by the projectile upon impact.")]
         [SerializeField] private int projectileDamage = 10;
         [Tooltip("Damage per tick of burn effect inflicted by the projectile.")]
-        [SerializeField] private int projectileBurnDamage = 10;
+        [SerializeField] private int projectileBurnDamage = 5;
+        [Tooltip("Projectile burn tick rate (in seconds): Determines how frequently burn damage is applied.")]
+        [SerializeField] private float projectileBurnTickRate = 1f;
         
         public ProjectileController ProjectilePrefab => projectilePrefab;
         public int PoolSize => poolSize;
@@ -32,5 +34,6 @@ namespace HHGArchero.Scriptables
         public float ProjectileDelay => projectileDelay;
         public int ProjectileDamage => projectileDamage;
         public int ProjectileBurnDamage => projectileBurnDamage;
+        public float ProjectileBurnTickRate => projectileBurnTickRate;
     }
 }
