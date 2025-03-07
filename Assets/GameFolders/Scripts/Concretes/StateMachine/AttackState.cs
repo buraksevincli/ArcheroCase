@@ -66,6 +66,7 @@ namespace HHGArchero.StateMachine
         public void ExitState(PlayerController player)
         {
             player.SetAttackAnimation(false);
+            player.UnselectTarget();
             player.SetAnimationSpeed(1);
             _fireTimer = 0f;
             _projectileFired = 0;

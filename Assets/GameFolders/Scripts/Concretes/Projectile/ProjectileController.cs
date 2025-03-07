@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HHGArchero.Enemies;
 using HHGArchero.Enemy;
+using HHGArchero.Extensions;
 using HHGArchero.Managers;
 using UnityEngine;
 
@@ -112,11 +113,7 @@ namespace HHGArchero.Projectile
             transform.position = currentEnemy.position;
             _startPos = currentEnemy.position; 
 
-            List<Transform> activeEnemies = EnemyPoolManager.Instance.ActiveEnemies;
-            Transform nextTarget = activeEnemies
-                .Where(e => e != currentEnemy)
-                .OrderBy(e => Vector3.Distance(currentEnemy.position, e.position))
-                .FirstOrDefault();
+            Transform nextTarget = EnemyPoolManager.Instance.ActiveEnemies.GetClosestTransform(currentEnemy,currentEnemy);
     
             if (nextTarget != null)
             {

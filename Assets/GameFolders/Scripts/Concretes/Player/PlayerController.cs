@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using HHGArchero.Projectile;
 using HHGArchero.Enemy;
+using HHGArchero.Extensions;
 using HHGArchero.Managers;
 using HHGArchero.StateMachine;
 using HHGArchero.Utilities;
@@ -20,15 +22,26 @@ namespace HHGArchero.Player
         
         private Animator _animator;
         private Mover _mover;
-        private Transform _currentEnemy;
+        private EnemyController _currentEnemy;
         private IPlayerState _currentState;
         private bool _canMove = true;
-        
+
+        public EnemyController CurrentEnemy
+        {
+            get => _currentEnemy;
+            set => _currentEnemy = value;
+        }
+
         protected override void Awake()
         {
             base.Awake();
             _animator = GetComponent<Animator>();
             _mover = new Mover(rigidbody, joystick);
+            
+        }
+
+        private void Start()
+        {
             _currentState = new AttackState();
             _currentState.EnterState(this);
         }
@@ -58,24 +71,35 @@ namespace HHGArchero.Player
 
         public void SelectTarget()
         {
-            List<Transform> activeEnemies = EnemyPoolManager.Instance.ActiveEnemies;
-            if (activeEnemies == null || activeEnemies.Count == 0)
-                return;
-    
-            Transform target = activeEnemies
-                .OrderBy(e => Vector3.Distance(bowTransform.position, e.position))
-                .FirstOrDefault();
+            Transform target = EnemyPoolManager.Instance.ActiveEnemies.GetClosestTransform(bowTransform);
             if (!target) return;
-            _currentEnemy = target;
+            target.TryGetComponent(out EnemyController targetEnemy);
+            _currentEnemy = targetEnemy;
+            _currentEnemy.OnDeath += OnDeathEnemyHandler;
+            _currentEnemy.SelectedTarget(true);
             transform.LookAt(target);
+
+        }
+
+        private void OnDeathEnemyHandler()
+        {
+            _currentEnemy.OnDeath -= OnDeathEnemyHandler;
+            _currentEnemy = null;
+        }
+
+        public void UnselectTarget()
+        {
+            if(!_currentEnemy) return;
+            _currentEnemy.SelectedTarget(false);
+            OnDeathEnemyHandler();
         }
 
         public void FireSingleProjectile()
         {
-            SelectTarget();
-            transform.LookAt(_currentEnemy);
+            if(!_currentEnemy) SelectTarget();
+            transform.LookAt(_currentEnemy.transform);
             Vector3 launchVelocity;
-            if (!ProjectileHelper.CalculateLaunchVelocity(bowTransform.position, _currentEnemy.position, out launchVelocity))
+            if (!ProjectileHelper.CalculateLaunchVelocity(bowTransform.position, _currentEnemy.transform.position, out launchVelocity))
             {
                 return;
             }
