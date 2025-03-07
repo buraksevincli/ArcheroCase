@@ -8,7 +8,7 @@ namespace HHGArchero.Projectile
         public static bool CalculateLaunchVelocity(Vector3 startPos, Vector3 targetPos, out Vector3 launchVelocity)
         {
             launchVelocity = Vector3.zero;
-            float angleRadians = DataManager.Instance.GameData.ProjectileAngle * Mathf.Deg2Rad;
+            float angleRadians = DataManager.Instance.ProjectileData.ProjectileAngle * Mathf.Deg2Rad;
             Vector3 toTarget = targetPos - startPos;
             Vector3 toTargetXZ = new Vector3(toTarget.x, 0f, toTarget.z);
             float distance = toTargetXZ.magnitude;

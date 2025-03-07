@@ -13,7 +13,7 @@ namespace HHGArchero.Enemy
     {
         private EnemyController _pooledObject;
         private Transform _playerTransform;
-        private GameData _gameData;
+        private EnemyData _enemyData;
         private Vector2 _spawnAreaMin, _spawnAreaMax;
         private int _enemyPoolSize;
         private float _minimumDistanceBetweenEnemies, _minimumDistanceFromPlayer;
@@ -26,14 +26,13 @@ namespace HHGArchero.Enemy
         {
             base.Awake();
             // Data Initialization
-            _gameData = DataManager.Instance.GameData;
-            _pooledObject = _gameData.PooledObject;
-            _enemyPoolSize = _gameData.EnemyPoolSize;
-            _spawnAreaMin = _gameData.SpawnAreaMin;
-            _spawnAreaMax = _gameData.SpawnAreaMax;
-            _minimumDistanceBetweenEnemies = _gameData.MinimumDistanceBetweenEnemies;
-            _minimumDistanceFromPlayer = _gameData.MinimumDistanceFromPlayer;
-            _playerTransform = PlayerController.Instance.transform;
+            _enemyData = DataManager.Instance.EnemyData;
+            _pooledObject = _enemyData.PooledObject;
+            _enemyPoolSize = _enemyData.EnemyPoolSize;
+            _spawnAreaMin = _enemyData.SpawnAreaMin;
+            _spawnAreaMax = _enemyData.SpawnAreaMax;
+            _minimumDistanceBetweenEnemies = _enemyData.MinimumDistanceBetweenEnemies;
+            _minimumDistanceFromPlayer = _enemyData.MinimumDistanceFromPlayer;
             
             // Pool check: Ensure the prefab has an EnemyController component.
             EnemyController prefabComponent = _pooledObject.GetComponent<EnemyController>();
@@ -48,6 +47,8 @@ namespace HHGArchero.Enemy
 
         private void Start()
         {
+            _playerTransform = PlayerController.Instance.transform;
+            
             for (int i = 0; i < _enemyPoolSize; i++)
             {
                 SpawnAtRandomPosition();

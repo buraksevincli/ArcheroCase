@@ -7,7 +7,7 @@ namespace HHGArchero.Projectile
 {
     public class ProjectilePoolManager : MonoSingleton<ProjectilePoolManager>
     {
-        private GameData _gameData;
+        private ProjectileData _projectileData;
         private ProjectileController _projectilePrefab;
         private int _poolSize;
         private ObjectPool<ProjectileController> _projectilePool;
@@ -16,9 +16,9 @@ namespace HHGArchero.Projectile
         {
             base.Awake();
             // Data Initialization
-            _gameData = DataManager.Instance.GameData;
-            _projectilePrefab = _gameData.ProjectilePrefab;
-            _poolSize = _gameData.PoolSize;
+            _projectileData = DataManager.Instance.ProjectileData;
+            _projectilePrefab = _projectileData.ProjectilePrefab;
+            _poolSize = _projectileData.PoolSize;
             // Pool Initialization
             _projectilePool = new ObjectPool<ProjectileController>(_projectilePrefab, _poolSize, transform);
         }

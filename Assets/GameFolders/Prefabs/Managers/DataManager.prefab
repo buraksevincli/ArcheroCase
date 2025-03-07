@@ -25,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 986979145569834246}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -46,4 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestroyOnLoad: 1
   eventData: {fileID: 11400000, guid: c474760c3706b164ea0ffbcf24ae42eb, type: 2}
-  gameData: {fileID: 11400000, guid: b58b5097f2c20ee4696ac8ba5d788f18, type: 2}
+  playerData: {fileID: 11400000, guid: b58b5097f2c20ee4696ac8ba5d788f18, type: 2}
+  enemyData: {fileID: 11400000, guid: 3ac2aaef978343a40b20be67c3841f02, type: 2}
+  projectileData: {fileID: 11400000, guid: cc660c871b552a742bf2f08d186d11b5, type: 2}
+  skillData: {fileID: 11400000, guid: 07d394470afd37d438bc12295145066d, type: 2}

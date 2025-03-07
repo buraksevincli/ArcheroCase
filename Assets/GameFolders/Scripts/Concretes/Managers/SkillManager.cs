@@ -1,10 +1,13 @@
 using System;
+using HHGArchero.Scriptables;
 using HHGArchero.Utilities;
 
 namespace HHGArchero.Managers
 {
     public class SkillManager : MonoSingleton<SkillManager>
     {
+        private SkillData _skillData;
+
         private bool _multiply;
         private bool _bounce;
         private bool _burn;
@@ -15,11 +18,17 @@ namespace HHGArchero.Managers
         private int _projectileBounceCount = 0;
         private int _projectileBurnTime = 0;
         private int _projectileFireSpeedCount = 1;
-        
+
         public int ProjectileMultiplicationCount => _projectileMultiplicationCount;
         public int ProjectileBounceCount => _projectileBounceCount;
         public int ProjectileBurnTime => _projectileBurnTime;
         public int ProjectileFireSpeedCount => _projectileFireSpeedCount;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            _skillData = DataManager.Instance.SkillData;
+        }
 
         private void OnEnable()
         {
@@ -41,43 +50,17 @@ namespace HHGArchero.Managers
 
         private void RecalculateMultipliers()
         {
-            if (_multiply)
-            {
-                _projectileMultiplicationCount = _rage ? 4 : 2;
-            }
-            else
-            {
-                _projectileMultiplicationCount = 1;
-            }
-
-            if (_bounce)
-            {
-                _projectileBounceCount = _rage ? 2 : 1;
-            }
-            else
-            {
-                _projectileBounceCount = 0;
-            }
-
-            if (_burn)
-            {
-                _projectileBurnTime = _rage ? 6 : 3;
-            }
-            else
-            {
-                _projectileBurnTime = 0;
-            }
-
-            if (_speed)
-            {
-                _projectileFireSpeedCount = _rage ? 4 : 2;
-            }
-            else
-            {
-                _projectileFireSpeedCount = 1;
-            }
+            _projectileMultiplicationCount = GetMultiplier(_multiply, normal: _skillData.MultiplicationCount, rage: _skillData.MultiplicationCountWithRage, defaultValue: _skillData.MultiplicationDefault);
+            _projectileBounceCount = GetMultiplier(_bounce, normal: _skillData.BounceCount, rage: _skillData.BounceCountWithRage, defaultValue: _skillData.BounceDefault);
+            _projectileBurnTime = GetMultiplier(_burn, normal: _skillData.BurnTime, rage: _skillData.BurnTimeWithRage, defaultValue: _skillData.BurnDefault);
+            _projectileFireSpeedCount = GetMultiplier(_speed, normal: _skillData.AttackSpeedCount, rage: _skillData.AttackSpeedCountWithRage, defaultValue: _skillData.AttackSpeedDefault);
         }
-        
+
+        private int GetMultiplier(bool isEnabled, int normal, int rage, int defaultValue)
+        {
+            return isEnabled ? (_rage ? rage : normal) : defaultValue;
+        }
+
         private void ProjectileMultiplicationHandler()
         {
             _multiply = !_multiply;

@@ -54,7 +54,7 @@ namespace HHGArchero.Projectile
         private IEnumerator ProjectileMotion()
         {
             float time = 0f;
-            int projectileLifeTime = DataManager.Instance.GameData.ProjectileLifeTime;
+            int projectileLifeTime = DataManager.Instance.ProjectileData.ProjectileLifeTime;
             _timeSinceLaunch = 0f;
             while (_launched)
             {
@@ -83,14 +83,14 @@ namespace HHGArchero.Projectile
             {
                 if (other.TryGetComponent(out IDamageable damageable))
                 {
-                    damageable.TakeDamage(DataManager.Instance.GameData.ProjectileDamage);
+                    damageable.TakeDamage(DataManager.Instance.ProjectileData.ProjectileDamage);
                 }
                 
                 if (SkillManager.Instance.ProjectileBurnTime > 0)
                 {
                     if (other.TryGetComponent(out EnemyController enemy))
                     {
-                        int burnDamage = DataManager.Instance.GameData.ProjectileBurnDamage; 
+                        int burnDamage = DataManager.Instance.ProjectileData.ProjectileBurnDamage; 
                         float burnDuration = SkillManager.Instance.ProjectileBurnTime; 
                         enemy.ApplyBurn(burnDamage, burnDuration);
                     }

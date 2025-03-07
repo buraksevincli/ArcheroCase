@@ -6,8 +6,8 @@ namespace HHGArchero.StateMachine
 {
     public class AttackState : IPlayerState
     {
-        private float _fireRate = DataManager.Instance.GameData.FireRate;
-        private float _projectileDelay = DataManager.Instance.GameData.ProjectileDelay;
+        private float _fireRate = DataManager.Instance.ProjectileData.FireRate;
+        private float _projectileDelay = DataManager.Instance.ProjectileData.ProjectileDelay;
 
         private float _fireTimer = 0f;
         private int _projectileFired = 0;

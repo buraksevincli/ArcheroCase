@@ -17,7 +17,7 @@ namespace HHGArchero.Player
 
         public void Move(Transform transform)
         {
-            _moveSpeed = DataManager.Instance.GameData.MoveSpeed;
+            _moveSpeed = DataManager.Instance.PlayerData.MoveSpeed;
             _rigidbody.velocity = new Vector3(_joystick.Horizontal * _moveSpeed, _rigidbody.velocity.y, _joystick.Vertical * _moveSpeed);
 
             if (_joystick.Horizontal != 0 || _joystick.Vertical != 0)
