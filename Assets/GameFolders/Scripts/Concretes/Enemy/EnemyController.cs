@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using HHGArchero.Enemies;
 using HHGArchero.Managers;
 using HHGArchero.Scriptables;
+using HHGArchero.UI;
 using UnityEngine;
 
 namespace HHGArchero.Enemy
 {
     public class EnemyController : MonoBehaviour, IDamageable
     {
+        [SerializeField] private HealthBarManager _healthBarManager;
         [SerializeField] private GameObject selectedEffect;
         [SerializeField] private ParticleSystem burnEffect;
         private EnemyPoolManager _spawnManager;
@@ -51,7 +53,13 @@ namespace HHGArchero.Enemy
         }
 
         private void Update()
-        { 
+        {
+            if (_health <= 0)
+            {
+                Die();
+            }
+
+            _healthBarManager.UpdateHealthBar(_enemyData.MaxHealth, _health);
             selectedEffect.SetActive(_isSelected);
 
             if (_isPaused || _isDead) return;
@@ -63,6 +71,7 @@ namespace HHGArchero.Enemy
                     _isBurning = true;
                     burnEffect.Play();
                 }
+
                 BurnEffect effect = _burnEffects[i];
                 if (Time.time >= effect.NextTickTime)
                 {
@@ -94,11 +103,12 @@ namespace HHGArchero.Enemy
 
         private void Die()
         {
-            _isDead = true;
             OnDeath?.Invoke();
-            _isSelected = false;
-            burnEffect.Stop();
             _isBurning = false;
+            _burnEffects.Clear();
+            _isDead = true;
+            _isSelected = false;
+            _health = 100;
             _spawnManager.ReturnAndRespawn(this);
         }
 
@@ -127,17 +137,12 @@ namespace HHGArchero.Enemy
         {
             _spawnManager = spawnManager;
             _isDead = false;
-            _burnEffects.Clear();
             _health = 100;
         }
 
         public void TakeDamage(int damage)
         {
             _health -= damage;
-            if (_health <= 0)
-            {
-                Die();
-            }
         }
 
         public void ApplyBurn(int damagePerTick, float burnDuration)

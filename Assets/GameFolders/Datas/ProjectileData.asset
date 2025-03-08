@@ -17,7 +17,7 @@ MonoBehaviour:
   projectileAngle: 30
   projectileLifeTime: 3
   fireRate: 1
-  projectileDelay: 0.1
+  projectileDelay: 0.2
   projectileDamage: 10
-  projectileBurnDamage: 2
+  projectileBurnDamage: 5
   projectileBurnTickRate: 1

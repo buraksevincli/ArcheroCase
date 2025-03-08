@@ -596,6 +596,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: -5
       objectReference: {fileID: 0}
+    - target: {fileID: 3115907108399004378, guid: 8bd2ab5b08e928c42bb1472c1cd53d26, type: 3}
+      propertyPath: m_Convex
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3115907108399004378, guid: 8bd2ab5b08e928c42bb1472c1cd53d26, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3115907108399004378, guid: 8bd2ab5b08e928c42bb1472c1cd53d26, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7718739621276745448, guid: 8bd2ab5b08e928c42bb1472c1cd53d26, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

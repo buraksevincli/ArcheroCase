@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using HHGArchero.Enemies;
 using HHGArchero.Enemy;
 using HHGArchero.Extensions;
@@ -11,6 +9,7 @@ namespace HHGArchero.Projectile
 {
     public class ProjectileController : MonoBehaviour
     {
+        [SerializeField] private ParticleSystem burnEffect;
         private ProjectilePoolManager _poolManager;
         private bool _launched = false;
         private Coroutine _movementCoroutine;
@@ -24,12 +23,12 @@ namespace HHGArchero.Projectile
         {
             GameManager.Instance.OnGamePaused += OnGamePausedHandler;
         }
-        
+
         private void OnDisable()
         {
             GameManager.Instance.OnGamePaused -= OnGamePausedHandler;
         }
-        
+
         private void OnGamePausedHandler(bool isPaused)
         {
             _canMove = !isPaused;
@@ -39,7 +38,7 @@ namespace HHGArchero.Projectile
         {
             _poolManager = poolManager;
         }
-        
+
         public void Launch(Vector3 initialVelocity)
         {
             gameObject.SetActive(true);
@@ -47,13 +46,22 @@ namespace HHGArchero.Projectile
             _initialVelocity = initialVelocity;
             _startPos = transform.position;
             _remainingBounces = SkillManager.Instance.ProjectileBounceCount;
-            if(_movementCoroutine != null)
+            if (_movementCoroutine != null)
                 StopCoroutine(_movementCoroutine);
             _movementCoroutine = StartCoroutine(ProjectileMotion());
         }
-        
+
         private IEnumerator ProjectileMotion()
         {
+            if (SkillManager.Instance.ProjectileBurnTime > 0)
+            {
+                burnEffect.Play();
+            }
+            else
+            {
+                burnEffect.Stop();
+            }
+
             float time = 0f;
             int projectileLifeTime = DataManager.Instance.ProjectileData.ProjectileLifeTime;
             _timeSinceLaunch = 0f;
@@ -64,6 +72,7 @@ namespace HHGArchero.Projectile
                     yield return null; // Pauses the coroutine's execution and resumes it in the next frame.
                     continue;
                 }
+
                 time += Time.deltaTime;
                 if (time >= projectileLifeTime)
                 {
@@ -71,13 +80,21 @@ namespace HHGArchero.Projectile
                     ReturnToPool();
                     yield break;
                 }
+
                 _timeSinceLaunch += Time.deltaTime * 2;
                 // Projectile motion: position = start + v0*t + 0.5*g*t^2
                 transform.position = _startPos + _initialVelocity * _timeSinceLaunch + Physics.gravity * (0.5f * _timeSinceLaunch * _timeSinceLaunch); // Simulate gravity effect
+
+                Vector3 velocity = _initialVelocity + Physics.gravity * _timeSinceLaunch;
+                if (velocity != Vector3.zero)
+                {
+                    transform.rotation = Quaternion.LookRotation(velocity);
+                }
+
                 yield return null; // Pauses the coroutine's execution and resumes it in the next frame.
             }
         }
-        
+
         private void OnTriggerEnter(Collider other)
         {
             if (_launched)
@@ -85,36 +102,37 @@ namespace HHGArchero.Projectile
                 if (other.TryGetComponent(out IDamageable damageable))
                 {
                     damageable.TakeDamage(DataManager.Instance.ProjectileData.ProjectileDamage);
-                }
-                
-                if (SkillManager.Instance.ProjectileBurnTime > 0)
-                {
-                    if (other.TryGetComponent(out EnemyController enemy))
-                    {
-                        int burnDamage = DataManager.Instance.ProjectileData.ProjectileBurnDamage; 
-                        float burnDuration = SkillManager.Instance.ProjectileBurnTime; 
-                        enemy.ApplyBurn(burnDamage, burnDuration);
-                    }
-                }
 
-                if (_remainingBounces > 0)
-                {
-                    BounceToNextEnemy(other.transform);
-                }
-                else
-                {
-                    ReturnToPool();
+
+                    if (SkillManager.Instance.ProjectileBurnTime > 0)
+                    {
+                        if (other.TryGetComponent(out EnemyController enemy))
+                        {
+                            int burnDamage = DataManager.Instance.ProjectileData.ProjectileBurnDamage;
+                            float burnDuration = SkillManager.Instance.ProjectileBurnTime;
+                            enemy.ApplyBurn(burnDamage, burnDuration);
+                        }
+                    }
+
+                    if (_remainingBounces > 0)
+                    {
+                        BounceToNextEnemy(other.transform);
+                    }
+                    else
+                    {
+                        ReturnToPool();
+                    }
                 }
             }
         }
-        
+
         private void BounceToNextEnemy(Transform currentEnemy)
         {
             transform.position = currentEnemy.position;
-            _startPos = currentEnemy.position; 
+            _startPos = currentEnemy.position;
 
-            Transform nextTarget = EnemyPoolManager.Instance.ActiveEnemies.GetClosestTransform(currentEnemy,currentEnemy);
-    
+            Transform nextTarget = EnemyPoolManager.Instance.ActiveEnemies.GetClosestTransform(currentEnemy, currentEnemy);
+
             if (nextTarget != null)
             {
                 Vector3 newLaunchVelocity;
@@ -126,6 +144,7 @@ namespace HHGArchero.Projectile
                     return;
                 }
             }
+
             ReturnToPool();
         }
 
@@ -138,6 +157,7 @@ namespace HHGArchero.Projectile
                 StopCoroutine(_movementCoroutine);
                 _movementCoroutine = null;
             }
+
             gameObject.SetActive(false);
             _poolManager?.ReturnProjectile(this);
         }
