@@ -1,4 +1,3 @@
-using System;
 using HHGArchero.Scriptables;
 using HHGArchero.Utilities;
 
@@ -28,68 +27,77 @@ namespace HHGArchero.Managers
         protected override void Awake()
         {
             base.Awake();
-            _skillData = DataManager.Instance.SkillData;
+            InitializeData();
         }
 
-        private void OnEnable()
+        private void OnEnable() => SubscribeEvents();
+        private void OnDisable() => UnsubscribeEvents();
+        private void InitializeData() => _skillData = DataManager.Instance.SkillData;
+        
+        private void SubscribeEvents()
         {
-            DataManager.Instance.EventData.ProjectileMultiplication += ProjectileMultiplicationHandler;
-            DataManager.Instance.EventData.ProjectileBounce += ProjectileBounceHandler;
-            DataManager.Instance.EventData.ProjectileBurn += ProjectileBurnHandler;
-            DataManager.Instance.EventData.ProjectileFireSpeed += ProjectileFireSpeedHandler;
-            DataManager.Instance.EventData.RageMode += RageModeHandler;
+            EventData eventData = DataManager.Instance.EventData;
+            eventData.ProjectileMultiplication += ProjectileMultiplicationHandler;
+            eventData.ProjectileBounce += ProjectileBounceHandler;
+            eventData.ProjectileBurn += ProjectileBurnHandler;
+            eventData.ProjectileFireSpeed += ProjectileFireSpeedHandler;
+            eventData.RageMode += RageModeHandler;
         }
 
-        private void OnDisable()
+        private void UnsubscribeEvents()
         {
-            DataManager.Instance.EventData.ProjectileMultiplication -= ProjectileMultiplicationHandler;
-            DataManager.Instance.EventData.ProjectileBounce -= ProjectileBounceHandler;
-            DataManager.Instance.EventData.ProjectileBurn -= ProjectileBurnHandler;
-            DataManager.Instance.EventData.ProjectileFireSpeed -= ProjectileFireSpeedHandler;
-            DataManager.Instance.EventData.RageMode -= RageModeHandler;
+            EventData eventData = DataManager.Instance.EventData;
+            eventData.ProjectileMultiplication -= ProjectileMultiplicationHandler;
+            eventData.ProjectileBounce -= ProjectileBounceHandler;
+            eventData.ProjectileBurn -= ProjectileBurnHandler;
+            eventData.ProjectileFireSpeed -= ProjectileFireSpeedHandler;
+            eventData.RageMode -= RageModeHandler;
         }
 
+        private void ProjectileMultiplicationHandler() => ToggleSkill(ref _multiply);
+        private void ProjectileBounceHandler() => ToggleSkill(ref _bounce);
+        private void ProjectileBurnHandler() => ToggleSkill(ref _burn);
+        private void ProjectileFireSpeedHandler() => ToggleSkill(ref _speed);
+        private void RageModeHandler() => ToggleSkill(ref _rage);
+
+        private void ToggleSkill(ref bool skillFlag)
+        {
+            skillFlag = !skillFlag;
+            RecalculateMultipliers();
+        }
+        
         private void RecalculateMultipliers()
         {
-            _projectileMultiplicationCount = GetMultiplier(_multiply, normal: _skillData.MultiplicationCount, rage: _skillData.MultiplicationCountWithRage, defaultValue: _skillData.MultiplicationDefault);
-            _projectileBounceCount = GetMultiplier(_bounce, normal: _skillData.BounceCount, rage: _skillData.BounceCountWithRage, defaultValue: _skillData.BounceDefault);
-            _projectileBurnTime = GetMultiplier(_burn, normal: _skillData.BurnTime, rage: _skillData.BurnTimeWithRage, defaultValue: _skillData.BurnDefault);
-            _projectileFireSpeedCount = GetMultiplier(_speed, normal: _skillData.AttackSpeedCount, rage: _skillData.AttackSpeedCountWithRage, defaultValue: _skillData.AttackSpeedDefault);
+            _projectileMultiplicationCount = GetMultiplier(
+                _multiply,
+                _skillData.MultiplicationCount,
+                _skillData.MultiplicationCountWithRage,
+                _skillData.MultiplicationDefault
+            );
+
+            _projectileBounceCount = GetMultiplier(
+                _bounce,
+                _skillData.BounceCount,
+                _skillData.BounceCountWithRage,
+                _skillData.BounceDefault
+            );
+
+            _projectileBurnTime = GetMultiplier(
+                _burn,
+                _skillData.BurnTime,
+                _skillData.BurnTimeWithRage,
+                _skillData.BurnDefault
+            );
+
+            _projectileFireSpeedCount = GetMultiplier(
+                _speed,
+                _skillData.AttackSpeedCount,
+                _skillData.AttackSpeedCountWithRage,
+                _skillData.AttackSpeedDefault
+            );
         }
 
         private int GetMultiplier(bool isEnabled, int normal, int rage, int defaultValue)
-        {
-            return isEnabled ? (_rage ? rage : normal) : defaultValue;
-        }
-
-        private void ProjectileMultiplicationHandler()
-        {
-            _multiply = !_multiply;
-            RecalculateMultipliers();
-        }
-
-        private void ProjectileBounceHandler()
-        {
-            _bounce = !_bounce;
-            RecalculateMultipliers();
-        }
-
-        private void ProjectileBurnHandler()
-        {
-            _burn = !_burn;
-            RecalculateMultipliers();
-        }
-
-        private void ProjectileFireSpeedHandler()
-        {
-            _speed = !_speed;
-            RecalculateMultipliers();
-        }
-
-        private void RageModeHandler()
-        {
-            _rage = !_rage;
-            RecalculateMultipliers();
-        }
+            => isEnabled ? (_rage ? rage : normal) : defaultValue;
     }
 }

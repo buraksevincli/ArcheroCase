@@ -15,22 +15,23 @@ namespace HHGArchero.Projectile
         protected override void Awake()
         {
             base.Awake();
-            // Data Initialization
+            InitializeData();
+            InitializePool();
+        }
+        
+        private void InitializeData()
+        {
             _projectileData = DataManager.Instance.ProjectileData;
             _projectilePrefab = _projectileData.ProjectilePrefab;
             _poolSize = _projectileData.PoolSize;
-            // Pool Initialization
+        }
+
+        private void InitializePool()
+        {
             _projectilePool = new ObjectPool<ProjectileController>(_projectilePrefab, _poolSize, transform);
         }
-
-        public ProjectileController GetProjectile()
-        {
-            return _projectilePool.Get();
-        }
-
-        public void ReturnProjectile(ProjectileController projectile)
-        {
-            _projectilePool.ReturnToPool(projectile);
-        }
+        public ProjectileController GetProjectile() => _projectilePool.Get();
+        public void ReturnProjectile(ProjectileController projectile) => _projectilePool.ReturnToPool(projectile);
+        
     }
 }

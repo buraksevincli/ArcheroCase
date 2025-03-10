@@ -19,52 +19,48 @@ namespace HHGArchero.Enemy
         private float _minimumDistanceBetweenEnemies, _minimumDistanceFromPlayer;
         private ObjectPool<EnemyController> _objectPool;
 
-        private List<Transform> _activeEnemies = new List<Transform>();
+        private readonly List<Transform> _activeEnemies = new List<Transform>();
         public List<Transform> ActiveEnemies => _activeEnemies;
 
         protected override void Awake()
         {
             base.Awake();
-            // Data Initialization
+            InitializeData();
+            InitializePool();
+        }
+
+        private void Start()
+        {
+            InitializePlayerTransform();
+            SpawnInitialEnemies();
+        }
+
+        private void InitializeData()
+        {
             _enemyData = DataManager.Instance.EnemyData;
-            _pooledObject = _enemyData.PooledObject;
             _enemyPoolSize = _enemyData.EnemyPoolSize;
             _spawnAreaMin = _enemyData.SpawnAreaMin;
             _spawnAreaMax = _enemyData.SpawnAreaMax;
             _minimumDistanceBetweenEnemies = _enemyData.MinimumDistanceBetweenEnemies;
             _minimumDistanceFromPlayer = _enemyData.MinimumDistanceFromPlayer;
-            
-            // Pool check: Ensure the prefab has an EnemyController component.
-            EnemyController prefabComponent = _pooledObject.GetComponent<EnemyController>();
-            if (prefabComponent == null)
-            {
-                Debug.LogError("The pooled prefab must have an EnemyController component.", this);
-                return;
-            }
-
-            _objectPool = new ObjectPool<EnemyController>(prefabComponent, _enemyPoolSize, transform);
+            _pooledObject = _enemyData.PooledObject;
         }
 
-        private void Start()
+        private void InitializePool()
         {
-            _playerTransform = PlayerController.Instance.transform;
-            
+            _objectPool = new ObjectPool<EnemyController>(_pooledObject, _enemyPoolSize, transform);
+        }
+        
+        private void InitializePlayerTransform() => _playerTransform = PlayerController.Instance.transform;
+
+        private void SpawnInitialEnemies()
+        {
             for (int i = 0; i < _enemyPoolSize; i++)
             {
                 SpawnAtRandomPosition();
             }
         }
-
-        public void ReturnAndRespawn(EnemyController obj)
-        {
-            // Remove the enemy from the active list before returning it to the pool.
-            if (_activeEnemies.Contains(obj.transform))
-                _activeEnemies.Remove(obj.transform);
-
-            _objectPool.ReturnToPool(obj);
-            SpawnAtRandomPosition();
-        }
-
+        
         private void SpawnAtRandomPosition()
         {
             EnemyController pooledObj = _objectPool.Get();
@@ -103,6 +99,16 @@ namespace HHGArchero.Enemy
                 candidate = GetRandomPosition();
             }
             return candidate;
+        }
+        
+        public void ReturnAndRespawn(EnemyController obj)
+        {
+            // Remove the enemy from the active list before returning it to the pool.
+            if (_activeEnemies.Contains(obj.transform))
+                _activeEnemies.Remove(obj.transform);
+
+            _objectPool.ReturnToPool(obj);
+            SpawnAtRandomPosition();
         }
     }
 }

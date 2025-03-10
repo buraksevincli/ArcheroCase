@@ -24,28 +24,15 @@ namespace HHGArchero.Player
         private Mover _mover;
         private EnemyController _currentEnemy;
         private IPlayerState _currentState;
-        private bool _canMove = true;
+        
         private Vector3 _originalScale;
+        private bool _canMove = true;
         private bool _isRage = false;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            _animator = GetComponent<Animator>();
-            _mover = new Mover(rigidbody, joystick);
-        }
-
-        private void Start()
-        {
-            _currentState = new AttackState();
-            _currentState.EnterState(this);
-            _originalScale = transform.localScale;
-        }
-
+        
+        private void Start() => InitializeData();
         private void OnEnable() => GameManager.Instance.OnGamePaused += OnGamePausedHandler;
         private void OnDisable() => GameManager.Instance.OnGamePaused -= OnGamePausedHandler;
-
-
+        
         private void Update()
         {
             if (!_canMove) return;
@@ -58,6 +45,15 @@ namespace HHGArchero.Player
         {
             if (!_canMove) return;
             _currentState.FixedUpdateState(this);
+        }
+
+        private void InitializeData()
+        {
+            _animator = GetComponent<Animator>();
+            _mover = new Mover(rigidbody, joystick);
+            _currentState = new AttackState();
+            _currentState.EnterState(this);
+            _originalScale = transform.localScale;
         }
 
         private void HandleRageMode()

@@ -10,18 +10,22 @@ namespace HHGArchero.Enemy
 {
     public class EnemyController : MonoBehaviour, IDamageable
     {
-        [SerializeField] private HealthBarManager _healthBarManager;
+        [SerializeField] private HealthBarManager healthBarManager;
         [SerializeField] private GameObject selectedEffect;
         [SerializeField] private ParticleSystem burnEffect;
+
         private EnemyPoolManager _spawnManager;
         private EnemyData _enemyData;
         private ProjectileData _projectileData;
+
         private int _health;
-        private bool _isDead;
         private float _burnTickInterval;
         private bool _isSelected;
         private bool _isPaused;
         private bool _isBurning;
+        private bool _isDead;
+
+        private List<BurnEffect> _burnEffects = new List<BurnEffect>();
 
         public event Action OnDeath;
 
@@ -32,57 +36,83 @@ namespace HHGArchero.Enemy
             public int DamagePerTick;
         }
 
-        private List<BurnEffect> _burnEffects = new List<BurnEffect>();
+        private void Awake() => InitializeData();
+        private void OnEnable() => SubscribeEvents();
+        private void OnDisable() => UnsubscribeEvents();
+        
+        private void Update()
+        {
+            if (_health <= 0 && !_isDead) Die();
+            UpdateUI();
+            if (_isPaused || _isDead) return;
+            UpdateBurnEffects();
+        }
 
-        private void Awake()
+        private void InitializeData()
         {
             _enemyData = DataManager.Instance.EnemyData;
             _projectileData = DataManager.Instance.ProjectileData;
+
             _health = _enemyData.MaxHealth;
             _burnTickInterval = _projectileData.ProjectileBurnTickRate;
+            _isDead = false;
+            _isPaused = false;
+            _isBurning = false;
         }
 
-        private void OnEnable()
+        public void SetSpawnManager(EnemyPoolManager spawnManager)
         {
-            GameManager.Instance.OnGamePaused += OnGamePausedHandler;
+            _spawnManager = spawnManager;
+            ResetEnemy();
         }
 
-        private void OnDisable()
+        private void ResetEnemy()
         {
-            GameManager.Instance.OnGamePaused -= OnGamePausedHandler;
+            _health = _enemyData.MaxHealth;
+            _isDead = false;
+            _isBurning = false;
+            _isSelected = false;
+            _burnEffects.Clear();
         }
 
-        private void Update()
+        private void SubscribeEvents() => GameManager.Instance.OnGamePaused += OnGamePausedHandler;
+        private void UnsubscribeEvents() => GameManager.Instance.OnGamePaused -= OnGamePausedHandler;
+        public void TakeDamage(int damage) => _health -= damage;
+
+        public void ApplyBurn(int damagePerTick, float burnDuration)
         {
-            if (_health <= 0)
+            if (burnDuration <= 0) return;
+
+            int totalTicks = Mathf.RoundToInt(burnDuration / _burnTickInterval);
+            BurnEffect newEffect = new BurnEffect
             {
-                Die();
+                NextTickTime = Mathf.Ceil(Time.time),
+                TicksRemaining = totalTicks,
+                DamagePerTick = damagePerTick
+            };
+            _burnEffects.Add(newEffect);
+        }
+
+        private void UpdateBurnEffects()
+        {
+            if (_burnEffects.Count > 0 && !_isBurning)
+            {
+                _isBurning = true;
+                burnEffect.Play();
             }
-
-            _healthBarManager.UpdateHealthBar(_enemyData.MaxHealth, _health);
-            selectedEffect.SetActive(_isSelected);
-
-            if (_isPaused || _isDead) return;
 
             for (int i = _burnEffects.Count - 1; i >= 0; i--)
             {
-                if (!_isBurning)
-                {
-                    _isBurning = true;
-                    burnEffect.Play();
-                }
-
                 BurnEffect effect = _burnEffects[i];
+
                 if (Time.time >= effect.NextTickTime)
                 {
                     TakeDamage(effect.DamagePerTick);
-                    if (_isDead || _burnEffects.Count == 0)
-                    {
-                        return;
-                    }
+                    if (_isDead || _burnEffects.Count == 0) return;
 
                     effect.NextTickTime += _burnTickInterval;
                     effect.TicksRemaining--;
+
                     if (effect.TicksRemaining <= 0)
                     {
                         _burnEffects.RemoveAt(i);
@@ -101,63 +131,33 @@ namespace HHGArchero.Enemy
             }
         }
 
-        private void Die()
-        {
-            OnDeath?.Invoke();
-            _isBurning = false;
-            _burnEffects.Clear();
-            _isDead = true;
-            _isSelected = false;
-            _health = 100;
-            _spawnManager.ReturnAndRespawn(this);
-        }
-
         private void OnGamePausedHandler(bool isPaused)
         {
             _isPaused = isPaused;
             if (_isBurning)
             {
-                if (_isPaused)
-                {
-                    burnEffect.Pause();
-                }
-                else
-                {
-                    burnEffect.Play();
-                }
+                if (_isPaused) burnEffect.Pause();
+                else burnEffect.Play();
             }
         }
 
-        public void SelectedTarget(bool isSelected)
+        private void Die()
         {
-            _isSelected = isSelected;
+            OnDeath?.Invoke();
+            _burnEffects.Clear();
+            _isBurning = false;
+            _isDead = true;
+            _isSelected = false;
+            _health = _enemyData.MaxHealth;
+            _spawnManager.ReturnAndRespawn(this);
         }
 
-        public void SetSpawnManager(EnemyPoolManager spawnManager)
+        public void SelectedTarget(bool isSelected) => _isSelected = isSelected;
+
+        private void UpdateUI()
         {
-            _spawnManager = spawnManager;
-            _isDead = false;
-            _health = 100;
-        }
-
-        public void TakeDamage(int damage)
-        {
-            _health -= damage;
-        }
-
-        public void ApplyBurn(int damagePerTick, float burnDuration)
-        {
-            if (burnDuration <= 0) return;
-
-            int totalTicks = Mathf.RoundToInt(burnDuration / _burnTickInterval);
-
-            BurnEffect newEffect = new BurnEffect
-            {
-                NextTickTime = Mathf.Ceil(Time.time),
-                TicksRemaining = totalTicks,
-                DamagePerTick = damagePerTick
-            };
-            _burnEffects.Add(newEffect);
+            healthBarManager.UpdateHealthBar(_enemyData.MaxHealth, _health);
+            selectedEffect.SetActive(_isSelected);
         }
     }
 }
