@@ -1,6 +1,7 @@
 using HHGArchero.Managers;
 using HHGArchero.Player;
 using HHGArchero.Strategies;
+using HHGArchero.Strategy;
 
 namespace HHGArchero.StateMachine
 {
@@ -41,7 +42,7 @@ namespace HHGArchero.StateMachine
         private IAttackStrategy DecideStrategy()
         {
             return SkillManager.Instance.IsSkillActivated()
-                ? new AttackWithSkill()
+                ? new AttackWithSkillStrategy()
                 : new NormalAttackStrategy();
         }
     }

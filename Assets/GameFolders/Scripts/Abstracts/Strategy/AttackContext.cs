@@ -1,14 +1,7 @@
 using HHGArchero.Managers;
 
-namespace HHGArchero.StateMachine
+namespace HHGArchero.Strategy
 {
-    public interface IAttackStrategy
-    {
-        void OnEnter(AttackContext context);
-        void OnUpdate(AttackContext context);
-        void OnExit(AttackContext context);
-    }
-
     public class AttackContext
     {
         public Player.PlayerController Player { get; }

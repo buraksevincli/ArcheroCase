@@ -1,5 +1,6 @@
 using HHGArchero.Managers;
 using HHGArchero.StateMachine;
+using HHGArchero.Strategy;
 using UnityEngine;
 
 namespace HHGArchero.Strategies

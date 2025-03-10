@@ -1,10 +1,11 @@
 using HHGArchero.Managers;
 using HHGArchero.StateMachine;
+using HHGArchero.Strategy;
 using UnityEngine;
 
 namespace HHGArchero.Strategies
 {
-    public class AttackWithSkill : IAttackStrategy
+    public class AttackWithSkillStrategy : IAttackStrategy
     {
         private int _arrowCount;
         public void OnEnter(AttackContext context)

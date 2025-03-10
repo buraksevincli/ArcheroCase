@@ -6,19 +6,19 @@ namespace HHGArchero.UI
 {
     public class SkillPanelManager : MonoBehaviour
     {
-        [Header("Panel & UI Elements")]
+        [Header("Panel & UI Elements")] 
         [SerializeField] private GameObject panel;
         [SerializeField] private GameObject pauseText;
         [SerializeField] private Button panelButton;
 
-        [Header("Skill Buttons")]
+        [Header("Skill Buttons")] 
         [SerializeField] private Button multiplicationButton;
         [SerializeField] private Button bounceButton;
         [SerializeField] private Button burnButton;
         [SerializeField] private Button speedButton;
         [SerializeField] private Button rageButton;
 
-        [Header("Colors")]
+        [Header("Colors")] 
         [SerializeField] private Color activeColor = Color.green;
         [SerializeField] private Color inactiveColor = Color.white;
 
