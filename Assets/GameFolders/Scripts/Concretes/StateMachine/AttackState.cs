@@ -1,82 +1,48 @@
 using HHGArchero.Managers;
 using HHGArchero.Player;
-using UnityEngine;
+using HHGArchero.Strategies;
 
 namespace HHGArchero.StateMachine
 {
     public class AttackState : IPlayerState
     {
-        private float _fireRate = DataManager.Instance.ProjectileData.FireRate / 2;
-        private float _projectileDelay = DataManager.Instance.ProjectileData.ProjectileDelay;
-
-        private float _fireTimer = 0f;
-        private int _projectileFired = 0;
-        private float _lastProjectileTime = 0f;
+        private IAttackStrategy _currentStrategy;
+        private AttackContext _context;
 
         public void EnterState(PlayerController player)
         {
-            player.StopPlayer();
-            _fireTimer = 0f;
-            _projectileFired = 0;
-            _lastProjectileTime = Time.time;
-            player.SelectTarget();
-            player.SetAttackAnimation(true);
+            _context = new AttackContext(player);
+            _currentStrategy = DecideStrategy();
+            _currentStrategy.OnEnter(_context);
+
+            SkillManager.Instance.OnSkillStateChanged += HandleSkillChange;
         }
 
         public void UpdateState(PlayerController player)
         {
-            if (player.JoystickInputMagnitude() > 0.1f)
-            {
-                player.TransitionToState(new RunningState());
-                return;
-            }
-
-            _fireTimer += Time.deltaTime;
-            FireProjectile(player);
+            _currentStrategy.OnUpdate(_context);
         }
 
-        private void FireProjectile(PlayerController player)
-        {
-            int arrowCount = SkillManager.Instance.ProjectileMultiplicationCount;
-
-            if (_projectileFired == 0 && _fireTimer >= _fireRate / SkillManager.Instance.ProjectileFireSpeedCount)
-            {
-                _fireRate = DataManager.Instance.ProjectileData.FireRate;
-                player.SetAnimationSpeed(SkillManager.Instance.ProjectileFireSpeedCount / _fireRate);
-                player.FireSingleProjectile();
-                _projectileFired = 1;
-                _lastProjectileTime = Time.time;
-            }
-            else if (_projectileFired > 0 && _projectileFired < arrowCount)
-            {
-                if (Time.time - _lastProjectileTime >= _projectileDelay)
-                {
-                    player.FireSingleProjectile();
-                    _projectileFired++;
-                    _lastProjectileTime = Time.time;
-                }
-            }
-            else if (_projectileFired == arrowCount)
-            {
-                ResetFireCycle();
-            }
-        }
-        
-        private void ResetFireCycle()
-        {
-            _fireTimer = 0f;
-            _projectileFired = 0;
-        }
-        
-        public void FixedUpdateState(PlayerController player){}
+        public void FixedUpdateState(PlayerController player) { }
 
         public void ExitState(PlayerController player)
         {
-            player.SetAttackAnimation(false);
-            player.UnselectTarget();
-            player.SetAnimationSpeed(1);
-            _fireTimer = 0f;
-            _projectileFired = 0;
+            _currentStrategy.OnExit(_context);
+            SkillManager.Instance.OnSkillStateChanged -= HandleSkillChange;
+        }
+
+        private void HandleSkillChange(bool skillActive)
+        {
+            _currentStrategy.OnExit(_context);
+            _currentStrategy = DecideStrategy();
+            _currentStrategy.OnEnter(_context);
+        }
+
+        private IAttackStrategy DecideStrategy()
+        {
+            return SkillManager.Instance.IsSkillActivated()
+                ? new AttackWithSkill()
+                : new NormalAttackStrategy();
         }
     }
 }

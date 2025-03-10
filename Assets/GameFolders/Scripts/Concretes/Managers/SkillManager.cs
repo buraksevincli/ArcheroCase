@@ -1,3 +1,4 @@
+using System;
 using HHGArchero.Scriptables;
 using HHGArchero.Utilities;
 
@@ -24,6 +25,20 @@ namespace HHGArchero.Managers
         public int ProjectileFireSpeedCount => _projectileFireSpeedCount;
         public bool IsRage => _rage;
 
+        public event Action<bool> OnSkillStateChanged;
+        private bool _skillActive;
+
+        public bool SkillActivated
+        {
+            get => _skillActive;
+            set
+            {
+                if (_skillActive == value) return;
+                _skillActive = value;
+                OnSkillStateChanged?.Invoke(_skillActive);
+            }
+        }
+
         protected override void Awake()
         {
             base.Awake();
@@ -32,8 +47,9 @@ namespace HHGArchero.Managers
 
         private void OnEnable() => SubscribeEvents();
         private void OnDisable() => UnsubscribeEvents();
+
         private void InitializeData() => _skillData = DataManager.Instance.SkillData;
-        
+
         private void SubscribeEvents()
         {
             EventData eventData = DataManager.Instance.EventData;
@@ -64,8 +80,9 @@ namespace HHGArchero.Managers
         {
             skillFlag = !skillFlag;
             RecalculateMultipliers();
+            SkillActivated = IsSkillActivated();
         }
-        
+
         private void RecalculateMultipliers()
         {
             _projectileMultiplicationCount = GetMultiplier(
@@ -99,5 +116,8 @@ namespace HHGArchero.Managers
 
         private int GetMultiplier(bool isEnabled, int normal, int rage, int defaultValue)
             => isEnabled ? (_rage ? rage : normal) : defaultValue;
+
+        public bool IsSkillActivated()
+            => _multiply || _bounce || _burn || _speed;
     }
 }

@@ -1,5 +1,3 @@
-using HHGArchero.Enemy;
-using HHGArchero.Projectile;
 using UnityEngine;
 
 namespace HHGArchero.Scriptables
