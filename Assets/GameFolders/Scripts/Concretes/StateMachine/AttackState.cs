@@ -32,6 +32,11 @@ namespace HHGArchero.StateMachine
             }
 
             _fireTimer += Time.deltaTime;
+            FireProjectile(player);
+        }
+
+        private void FireProjectile(PlayerController player)
+        {
             int arrowCount = SkillManager.Instance.ProjectileMultiplicationCount;
 
             if (_projectileFired == 0 && _fireTimer >= _fireRate / SkillManager.Instance.ProjectileFireSpeedCount)
@@ -53,15 +58,17 @@ namespace HHGArchero.StateMachine
             }
             else if (_projectileFired == arrowCount)
             {
-                _fireTimer = 0f;
-                _projectileFired = 0;
+                ResetFireCycle();
             }
         }
-
-        public void FixedUpdateState(PlayerController player)
+        
+        private void ResetFireCycle()
         {
-            //
+            _fireTimer = 0f;
+            _projectileFired = 0;
         }
+        
+        public void FixedUpdateState(PlayerController player){}
 
         public void ExitState(PlayerController player)
         {

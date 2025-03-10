@@ -23,6 +23,7 @@ namespace HHGArchero.Managers
         public int ProjectileBounceCount => _projectileBounceCount;
         public int ProjectileBurnTime => _projectileBurnTime;
         public int ProjectileFireSpeedCount => _projectileFireSpeedCount;
+        public bool IsRage => _rage;
 
         protected override void Awake()
         {
